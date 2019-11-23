@@ -58,7 +58,25 @@ def behaviors():
 
     return jsonify(behaviors)
 
-# Pulling Data by ST for metadata -- dashboard/tooltip
+####### Route to pull list of ST
+@app.route("/states")
+def states():
+
+    states = []
+
+    sel = [data.ST]
+    result = db.session.query(*sel).all()
+
+    for st in result:
+        # behavior_list = {}
+        if st[0] in states:
+            pass
+        else:
+            states.append(st[0])
+
+    return jsonify(states)
+
+####### Pulling Data by ST for metadata -- dashboard/tooltip
 @app.route("/metadata/<ST>")
 def maindata(ST):
     
@@ -80,6 +98,10 @@ def maindata(ST):
     st_data = []
     # Iterate through results and store data
     for r in results:
+        if r.Percent is None:
+            percent = 0
+        else:
+            percent = float(r.Percent)
         store_data = {
             'FES': r.FES,
             'ST': r.ST,
@@ -89,33 +111,13 @@ def maindata(ST):
             'Behavior': r.Behavior,
             'Received': int(r.Received),
             'Possible': int(r.Possible),
-            'Percent': float(r.Percent)
+            'Percent': percent
         }
         st_data.append(store_data)
     
     return jsonify(st_data)
 
-# # Pulling data by st for percent values to chart
-# @app.route("/values/<ST>")
-# def percents(ST):
-#     """Return `otu_ids`, `otu_labels`,and `sample_values`."""
-#     stmt = db.session.query(data).statement
-#     df = pd.read_sql_query(stmt, db.session.bind)
 
-#     # Filter the data based on the ST and
-#     # only keep rows with values above 1 DO WE NEED THIS?
-#     sample_data = df.loc[df[ST], ["otu_id", "otu_label", ST]]
-
-#     # Sort by sample
-#     sample_data.sort_values(by=sample, ascending=False, inplace=True)
-
-#     # Format the data to send as json
-#     data = {
-#         "otu_ids": sample_data.otu_id.values.tolist(),
-#         "sample_values": sample_data[sample].values.tolist(),
-#         "otu_labels": sample_data.otu_label.tolist(),
-#     }
-#     return jsonify(data)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
