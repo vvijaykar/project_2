@@ -2,9 +2,11 @@
 var formatCount = d3.format(",.0f")
 var formatPercent = d3.format(".1%");
 
-// function to sum values in an array, starting value = 0
-function sum(arr) {
-    return arr.reduce((a, b) => a + b, 0)
+// function to avg values in an array, starting value = 0
+function avg(arr) {
+    var sum = arr.reduce((a, b) => a + b, 0);
+    var length = arr.length;
+    return sum/length
 }
 
 // URL to access data by ST -- can replace AK with ${ST} for production
@@ -24,7 +26,7 @@ d3.json(metadataURL).then(function(data) {
     })
     // Add all the values in the array together
     var sumFesScores = sum(fesScores)
-    
+
     //Display results
     console.log(`Total: ${sumFesScores}`)
     console.log(`Denominator: ${fesScores.length}`)
