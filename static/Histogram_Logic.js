@@ -12,14 +12,15 @@ var svg = d3.select("#my_dataviz")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
-// get the data
-
-
-
 // A formatter for counts and percent
 var formatCount = d3.format(",.0f")
 var formatPercent = d3.format(".0%");
 
+var url = `/metadata/CA`
+
+// Pull data from the API
+d3.json(url).then(function(data){
+  console.log(data.length);
   // X axis: scale and draw:
   var x = d3.scaleLinear()
       .domain([0,105])
@@ -29,10 +30,15 @@ var formatPercent = d3.format(".0%");
       .call(d3.axisBottom(x));
 
   // set the parameters for the histogram
+    // var scores = Object.values(yesData.Percent)
+    // console.log(scores)
+
   var histogram = d3.histogram()
-      .value(function(d) { return +d.Percent; })   // value to bin
-      .domain(x.domain())  // then the domain of the graphic
-      .thresholds(x.ticks(21)); // numbers of bins
+  .value(d => {return +d.Percent*100})   // value to bin
+  .domain(x.domain())  // then the domain of the graphic
+  .thresholds(x.ticks(21)); // numbers of bins
+
+ 
 
       
 // Need logic for user input to select d.ST to be used in bins1 and bins2 below
@@ -50,14 +56,15 @@ var formatPercent = d3.format(".0%");
 
   
   // calculate total number of data points for given selection 
-  var state_total_good = data.filter( function(d) { return (d.ST === "CA" && d.Behavior === "Genuine Thank" && d.FES === "Yes") })
+  var state_total_good = data.filter( function(d) { return (d.ST === "CA" && d.Behavior === "Genuine Thank" && d.FES === "FES Present") })
   console.log(state_total_good.length)
-   // calculate total number of data points for given selection but opposite FES
-   var state_total_bad = data.filter( function(d) { return (d.ST === "CA" && d.Behavior === "Genuine Thank" && d.FES === "No") })
+  // calculate total number of data points for given selection but opposite FES
+  var state_total_bad = data.filter( function(d) { return (d.ST === "CA" && d.Behavior === "Genuine Thank" && d.FES === "No FES Present") })
   console.log(state_total_bad.length)
-   // calculate total number of data points for given selection less FES
-   var state_total = data.filter( function(d) { return (d.ST === "CA" && d.Behavior === "Genuine Thank") })
+  // calculate total number of data points for given selection less FES
+  var state_total = data.filter( function(d) { return (d.ST === "CA" && d.Behavior === "Genuine Thank") })
   console.log(state_total.length)
+  console.log(state_total)
   
   // Stats for state_total_good for hypothesis test
   var receivedGood = 0
@@ -111,10 +118,10 @@ var formatPercent = d3.format(".0%");
 
 
   // select rows with the desired filters
-   var bins1 = histogram(data.filter( function(d) {return (d.ST === "CA" && d.Behavior === "Genuine Thank" && d.FES === "Yes") } ));
+   var bins1 = histogram(data.filter( function(d) {return (d.ST === "CA" && d.Behavior === "Genuine Thank" && d.FES === "FES Present") } ));
 
   // select rows with desired state and behavior but opposite FES
-  var bins2 = histogram(data.filter( function(d) {return (d.ST === "CA" && d.Behavior === "Genuine Thank" && d.FES === "No") } ));
+  // var bins2 = histogram(data.filter( function(d) {return (d.ST === "CA" && d.Behavior === "Genuine Thank" && d.FES === "No FES Present") } ));
 
   // Y axis: scale and draw:
   var y = d3.scaleLinear()
@@ -183,7 +190,7 @@ var formatPercent = d3.format(".0%");
   bar.append("rect")
         .attr("x", 1)
         .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
-        .attr("width", function(d) { return x(d.x1) - x(d.x0) -1; })
+        .attr("width", function(d) { return x(d.x1) - x(d.x0) - 1; })
         .attr("height", function(d) { return height - y(d.length); })
         .style("fill", "#69b3a2")
         .style("opacity", 0.6)
