@@ -52,6 +52,7 @@ function filterPercent(ST, Behavior, FES) {
         // Avg all the values in the array together
         // console.log(`Avg: ${formatPercent(avg(filteredScores))}`)
     })
+<<<<<<< HEAD
 
     // Hold the filtered data so that the values are all in equally sized arrays
     var filteredData = {
@@ -92,3 +93,15 @@ function init() {
 
 // init()
 // filterPercent('CA', 'Genuine Thank', 'FES Present')
+=======
+    // Add all the values in the array together
+    var sumFesScores = sum(fesScores)
+
+    //Display results
+    console.log(`Total: ${sumFesScores}`)
+    console.log(`Denominator: ${fesScores.length}`)
+    console.log(`Avg: ${formatPercent(sumFesScores/fesScores.length)}`)
+    console.log(fesScores)
+
+})
+>>>>>>> 74689506bf77dceb18f8718bc571be1d4f3d43a4
