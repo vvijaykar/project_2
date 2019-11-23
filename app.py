@@ -58,9 +58,9 @@ def behaviors():
 
     return jsonify(behaviors)
 
-
-@app.route("/data")
-def maindata():
+# Pulling Data by ST for metadata -- dashboard/tooltip
+@app.route("/metadata/<ST>")
+def maindata(ST):
     
     # Select all of the columns
     sel = [
@@ -75,24 +75,47 @@ def maindata():
         data.Percent
     ]
     # Query the db
-    results = db.session.query(*sel).all()
+    results = db.session.query(*sel).filter(data.ST == ST).all()
     # Create a dictionary to hold the values
-    main_data = []
+    st_data = []
     # Iterate through results and store data
-    for result in results:
-        fes_data = {}
-        fes_data["FES"] = result[0]
-        fes_data["ST"] = result[1]
-        fes_data["MSA"] = result[2]
-        fes_data["City"] = result[3]
-        fes_data["StoreID"] = result[4]
-        fes_data["Behavior"] = result[5]
-        fes_data["Received"] = result[6]
-        fes_data["Possible"] = result[7]
-        fes_data["Percent"] = result[8]
+    for r in results:
+        store_data = {
+            'FES': r.FES,
+            'ST': r.ST,
+            'MSA': r.MSA,
+            'City': r.City,
+            'StoreID': r.StoreID,
+            'Behavior': r.Behavior,
+            'Received': int(r.Received),
+            'Possible': int(r.Possible),
+            'Percent': float(r.Percent)
+        }
+        st_data.append(store_data)
+    
+    return jsonify(st_data)
 
-    print(main_data)
-    return jsonify(main_data)
+# # Pulling data by st for percent values to chart
+# @app.route("/values/<ST>")
+# def percents(ST):
+#     """Return `otu_ids`, `otu_labels`,and `sample_values`."""
+#     stmt = db.session.query(data).statement
+#     df = pd.read_sql_query(stmt, db.session.bind)
+
+#     # Filter the data based on the ST and
+#     # only keep rows with values above 1 DO WE NEED THIS?
+#     sample_data = df.loc[df[ST], ["otu_id", "otu_label", ST]]
+
+#     # Sort by sample
+#     sample_data.sort_values(by=sample, ascending=False, inplace=True)
+
+#     # Format the data to send as json
+#     data = {
+#         "otu_ids": sample_data.otu_id.values.tolist(),
+#         "sample_values": sample_data[sample].values.tolist(),
+#         "otu_labels": sample_data.otu_label.tolist(),
+#     }
+#     return jsonify(data)
 
 if __name__ == "__main__":
     app.run()
