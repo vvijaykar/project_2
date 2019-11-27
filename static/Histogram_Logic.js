@@ -1,8 +1,10 @@
 // set the dimensions and margins of the graph
-var margin = {top: 200, right: 30, bottom: 70, left: 500},
-    width = 1600 - margin.left - margin.right,
-    height = 750 - margin.top - margin.bottom;
-
+var svgWidth = 1000;
+var svgHeight = 500;
+// set the dimensions and margins of the graph
+var margin = {top: 20, right: 40, bottom: 100, left: 100},
+    width = svgWidth - margin.left - margin.right,
+    height = svgHeight - margin.top - margin.bottom;
 // append the svg object to the body of the page
 var svg = d3.select("#my_dataviz")
   .append("svg")
@@ -145,7 +147,7 @@ d3.json(url).then(function(data){
     // .orient("right").ticks(5)
 
   // Add a tooltip
-    var tooltip = d3.select("#my_dataviz")
+    var tooltip = d3.select("#myHistogram")
       .append("div")
       .style("opacity", 0)
       .attr("class", "tooltip")
