@@ -40,6 +40,22 @@ def index():
     """Return the homepage."""
     return render_template("index.html")
 
+####### Route to pull options for FES presence
+@app.route("/fes")
+def fesOptions():
+    fesOptions = []
+
+    sel =[data.FES]
+    result = db.session.query(*sel).all()
+
+    for o in result:
+        if o[0] in fesOptions:
+            pass
+        else:
+            fesOptions.append(o[0])
+
+    return jsonify(behaviors)
+
 ####### Route to pull list of Behavior Names
 @app.route("/behaviors")
 def behaviors():
@@ -77,8 +93,8 @@ def states():
     return jsonify(states)
 
 ####### Pulling Data by ST for metadata -- dashboard/tooltip
-@app.route("/metadata/<ST>")
-def maindata(ST):
+@app.route("/data/<Behavior>")
+def maindata(Behavior):
     
     # Select all of the columns
     sel = [
@@ -93,7 +109,7 @@ def maindata(ST):
         data.Percent
     ]
     # Query the db
-    results = db.session.query(*sel).filter(data.ST == ST).all()
+    results = db.session.query(*sel).filter(data.Behavior == Behavior).all()
     # Create a dictionary to hold the values
     st_data = []
     # Iterate through results and store data
@@ -117,7 +133,46 @@ def maindata(ST):
     
     return jsonify(st_data)
 
-
+####### Pulling ALL Data w/o filters
+@app.route("/data")
+def alldata():
+    
+    # Select all of the columns
+    sel = [
+        data.FES,
+        data.ST,
+        data.MSA,
+        data.City,
+        data.StoreID,
+        data.Behavior,
+        data.Received,
+        data.Possible,
+        data.Percent
+    ]
+    # Query the db
+    results = db.session.query(*sel).all()
+    # Create a dictionary to hold the values
+    all_data = []
+    # Iterate through results and store data
+    for r in results:
+        if r.Percent is None:
+            percent = 0
+        else:
+            percent = float(r.Percent)
+        store_data = {
+            'FES': r.FES,
+            'ST': r.ST,
+            'MSA': r.MSA,
+            'City': r.City,
+            'StoreID': r.StoreID,
+            'Behavior': r.Behavior,
+            'Received': int(r.Received),
+            'Possible': int(r.Possible),
+            'Percent': percent
+        }
+        all_data.append(store_data)
+    
+    return jsonify(all_data)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,13 +1,48 @@
-// // A formatter for counts and percent
-// var formatCount = d3.format(",.0f")
-// var formatPercent = d3.format(".1%");
 
-// // function to avg values in an array, starting value = 0
-// function avg(arr) {
-//     var sum = arr.reduce((a, b) => a + b, 0);
-//     var length = arr.length;
-//     return sum/length
-// }
+//////////////////////////////
+//////////// CREATE DROP DOWN FOR STATE FILTER 
+//////////////////////////////
+function init() {
+  // Grab a reference to the dropdown select element
+  var behaviorSelector = d3.select("#selBehavior");
+
+  // Use the list of ST names to populate the select options
+  d3.json("/behaviors").then((behaviorNames) => {
+    behaviorNames.forEach((b) => {
+        behaviorSelector
+            .append("option")
+            .text(b)
+            .property("value", b);
+        // console.log(b);
+    });
+
+    // Use the first ST from the list to build the initial plots
+    const firstBehavior = behaviorNames[0];
+    console.log(`First rendered: ${firstBehavior}`)
+    renderHistogram('CA', `${firstBehavior}`, `No FES Present`);
+    // buildCharts(firstSt);
+    // buildMetadata(firstSt);
+  });
+}
+
+init()
+
+function optionChanged(newBehavior) {
+    // Fetch new data each time a new sample is selected
+    renderHistogram('CA', `${newBehavior}`, `FES Present`)
+};
+// filterPercent('CA', 'Genuine Thank', 'FES Present')
+
+
+// 1. initialize pg with first behavior/st
+// 2. use drop down or filter selection to choose st
+// 3. query data for that state
+// 4. event listener if behavior is changed
+// 5. event listener to toggle between FES Present and no fes present
+// 6. function to build histogram
+// 7. function for stats analysis of selected data
+// 8. tooltip that summarizes each bin 
+
 
 // // URL to access data by ST -- can replace AK with ${ST} for production
 // // function to create endpoint for the specific state
@@ -64,31 +99,3 @@
 
 //     return filteredData
 // }
-
-// //////////////////////////////
-// //////////// CREATE DROP DOWN FOR STATE FILTER 
-// //////////////////////////////
-// function init() {
-//   // Grab a reference to the dropdown select element
-//   var stSelector = d3.select("#selST");
-
-//   // Use the list of ST names to populate the select options
-//   d3.json("/states").then((stNames) => {
-//     stNames.forEach((st) => {
-//         stSelector
-//             .append("option")
-//             .text(st)
-//             .property("value", st);
-//         console.log(st);
-//     });
-
-//     // Use the first ST from the list to build the initial plots
-//     const firstSt = stNames[0];
-//     console.log(`First rendered: ${firstSt}`)
-//     // buildCharts(firstSt);
-//     // buildMetadata(firstSt);
-//   });
-// }
-
-// // init()
-// // filterPercent('CA', 'Genuine Thank', 'FES Present')
