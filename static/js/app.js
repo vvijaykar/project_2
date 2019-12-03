@@ -17,11 +17,9 @@ function init() {
     });
 
     // Use the first ST from the list to build the initial plots
-    const firstBehavior = behaviorNames[2];
+    const firstBehavior = 'Cashier Conversation';
     console.log(`First rendered: ${firstBehavior}`)
     renderHistogram(`${firstBehavior}`, `FES Present`);
-    // buildCharts(firstSt);
-    // buildMetadata(firstSt);
   });
 }
 
