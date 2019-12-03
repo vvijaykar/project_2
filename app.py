@@ -9,6 +9,7 @@ import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
+from sqlalchemy import func
 
 from flask import Flask, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
@@ -63,7 +64,7 @@ def behaviors():
     behaviors = []
 
     behavior_sel =[data.Behavior]
-    behavior_result = db.session.query(*behavior_sel).all()
+    behavior_result = db.session.query(*behavior_sel).filter(data.Behavior != "FES Present or Found").all()
 
     for b in behavior_result:
         # behavior_list = {}
@@ -172,6 +173,38 @@ def alldata():
         }
         all_data.append(store_data)
     
+    return jsonify(all_data)
+
+####### Sum by behavior and fes
+@app.route("/data/behavior")
+def barchart():
+    
+    # Select all of the columns
+    sel_fes = [
+        data.Behavior,
+        (func.sum(data.Received)*100/func.sum(data.Possible)).label('avg')
+    ]
+    # Query the db
+    results_fes = db.session.query(*sel_fes).filter(data.FES == 'FES Present', data.Behavior != "FES Present or Found").group_by(data.Behavior).order_by(data.Behavior).all()
+    results_nofes = db.session.query(*sel_fes).filter(data.FES == 'No FES Present', data.Behavior != "FES Present or Found").group_by(data.Behavior).order_by(data.Behavior).all()
+    # Create a dictionary to hold the values
+    behaviors = []
+    fes = ['FES_Present']
+    nofes = ['No_FES_Present']
+    # Iterate through results and store data
+    for r in results_fes:
+        behaviors.append(r.Behavior)
+        fes.append(r.avg)
+    
+    for r in results_nofes:
+        nofes.append(r.avg)
+    
+    all_data = {
+        'Behavior': behaviors,
+        'FES': fes,
+        'NoFES': nofes
+    }
+
     return jsonify(all_data)
 
 if __name__ == "__main__":
