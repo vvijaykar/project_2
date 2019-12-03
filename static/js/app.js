@@ -17,7 +17,7 @@ function init() {
     });
 
     // Use the first ST from the list to build the initial plots
-    const firstBehavior = behaviorNames[0];
+    const firstBehavior = behaviorNames[2];
     console.log(`First rendered: ${firstBehavior}`)
     renderHistogram(`${firstBehavior}`, `FES Present`);
     // buildCharts(firstSt);
